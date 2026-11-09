@@ -24,6 +24,9 @@ namespace CodingPortfolio.Data
                .HasMany(developer => developer.Projects)
                .WithOne(project => project.Developer)
                .HasForeignKey(project => project.DeveloperId);
+            modelBuilder.Entity<Developer>()
+           .Property(d => d.CreatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
             modelBuilder.Entity<Project>()
                 .HasKey(project => project.ProjectId);
             modelBuilder.Entity<Project>()
@@ -33,6 +36,7 @@ namespace CodingPortfolio.Data
 
             modelBuilder.Entity<ProjectTask>()
                 .HasKey(task => task.TaskId);
+
 
 
             modelBuilder.Entity<Developer>().HasIndex(Developer => Developer.Email).IsUnique();

@@ -8,8 +8,8 @@
         public string PasswordHash { get; set; } = string.Empty;  
         public string? Bio { get; set; } 
         public string? GitHubUrl { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    
         public ICollection<Project> Projects { get; set; } = new List<Project>();
     }
 }

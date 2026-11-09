@@ -33,6 +33,11 @@ namespace CodingPortfolio.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -53,7 +58,7 @@ namespace CodingPortfolio.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Developers");
+                    b.ToTable("Developers", (string)null);
                 });
 
             modelBuilder.Entity("CodingPortfolio.Models.Project", b =>
@@ -91,7 +96,7 @@ namespace CodingPortfolio.Migrations
 
                     b.HasIndex("DeveloperId");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("CodingPortfolio.Models.ProjectTask", b =>
@@ -122,7 +127,7 @@ namespace CodingPortfolio.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectTasks");
+                    b.ToTable("ProjectTasks", (string)null);
                 });
 
             modelBuilder.Entity("CodingPortfolio.Models.Project", b =>

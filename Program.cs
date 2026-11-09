@@ -1,5 +1,10 @@
 using CodingPortfolio.Data;
+using CodingPortfolio.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 namespace CodingPortfolio
 {
     public class Program
@@ -15,6 +20,33 @@ namespace CodingPortfolio
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddOpenApi();
+
+            builder.Services.Configure<JwtSettings>(
+                builder.Configuration.GetSection(JwtSettings.SectionName));
+            builder.Services.AddScoped<ItokenService, TokenService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            var jwtSettings = builder.Configuration
+                .GetSection(JwtSettings.SectionName)
+                .Get<JwtSettings>()!;
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+              {
+                  options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = true,
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidateIssuerSigningKey = true,
+                                    ValidIssuer = jwtSettings.Issuer,
+                                    ValidAudience = jwtSettings.Audience,
+                                    IssuerSigningKey = new SymmetricSecurityKey(
+                                        Encoding.UTF8.GetBytes(jwtSettings.key))
+                                };
+                            });
+
+            builder.Services.AddAuthorization();
+            builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 
             var app = builder.Build();

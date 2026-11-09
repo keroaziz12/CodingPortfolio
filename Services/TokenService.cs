@@ -1,0 +1,39 @@
+﻿using CodingPortfolio.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Runtime;
+using System.Security.Claims;
+using System.Text;
+
+namespace CodingPortfolio.Services
+{
+    public class TokenService : ItokenService
+    {
+        private readonly JwtSettings _settings;
+        public TokenService(IOptions<JwtSettings> options)
+        {
+            _settings = options.Value;
+        }
+        public string CreateToken(Developer developer)
+        {
+            var claims = new List<Claim>
+            {
+                new (ClaimTypes.NameIdentifier,developer.DeveloperId.ToString()),
+                new (ClaimTypes.Email,developer.Email)
+            };
+
+            var kay = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.key));
+            var credentials = new SigningCredentials(kay, SecurityAlgorithms.Aes128CbcHmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _settings.Issuer,
+                audience: _settings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_settings.ExpiresInMinutes),
+                signingCredentials :credentials
+                );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }  
+    }
+}
