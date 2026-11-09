@@ -1,6 +1,34 @@
-@CodingPortfolio_HostAddress = http://localhost:5240
+@baseUrl = http://localhost:5240
+# لو شغّلت المشروع على بروفايل https بدّل السطر اللي فوق بـ:
+# @baseUrl = https://localhost:7113
 
-GET {{CodingPortfolio_HostAddress}}/weatherforecast/
-Accept: application/json
+# غيّر القيم دي لبياناتك قبل التشغيل
+@name = YourName
+@email = your@email.com
+@password = YourPassword
 
-###
+### تسجيل مطور جديد
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "{{name}}",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### تسجيل دخول
+# شغّل الطلب ده الأول عشان الـ token يتسجل في المتغير login
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### بيانات المطور الحالي
+# التوكن بيتاخد تلقائيًا من نتيجة الـ login اللي فوق
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{login.response.body.$.token}}

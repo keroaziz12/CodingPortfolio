@@ -6,39 +6,41 @@ using Microsoft.EntityFrameworkCore;
 namespace CodingPortfolio.Services
 {
     public class AuthService : IAuthService
-    { 
+    {
         private readonly ApplicationDbContext _context;
-        private readonly ItokenService _tokenService;
-        private readonly PasswordHasher<Developer> _passwordHasher = new(); 
-        public AuthService(ApplicationDbContext context, ItokenService tokenService)
+        private readonly ITokenService _tokenService;
+        private readonly PasswordHasher<Developer> _passwordHasher = new();
+
+        public AuthService(ApplicationDbContext context, ITokenService tokenService)
         {
             _context = context;
             _tokenService = tokenService;
         }
 
-       
-
-        public  async Task<Developer?> RegisterAsync(string name, string email, string password)
+        public async Task<Developer?> RegisterAsync(string name, string email, string password)
         {
             var normalizedEmail = email.Trim().ToLowerInvariant();
-            var exists = await _context.Developers.AnyAsync(d => d.Email == normalizedEmail);
+
+            var exists = await _context.Developers
+                .AnyAsync(d => d.Email == normalizedEmail);
+
             if (exists)
                 return null;
 
+            var developer = new Developer
             {
-                var developer = new Developer
-                {
-                    Name = name.Trim(),
-                    Email = normalizedEmail,
-                };
-                developer.PasswordHash = _passwordHasher.HashPassword(developer, password);
-                _context.Developers.Add(developer);
-                await _context.SaveChangesAsync();
-                return developer;
-            }
+                Name = name.Trim(),
+                Email = normalizedEmail
+            };
 
+            developer.PasswordHash = _passwordHasher.HashPassword(developer, password);
 
+            _context.Developers.Add(developer);
+            await _context.SaveChangesAsync();
+
+            return developer;
         }
+
         public async Task<string?> LoginAsync(string email, string password)
         {
             var normalizedEmail = email.Trim().ToLowerInvariant();
@@ -57,9 +59,5 @@ namespace CodingPortfolio.Services
 
             return _tokenService.CreateToken(developer);
         }
-
-
-
-        }
     }
-
+}
