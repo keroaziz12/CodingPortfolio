@@ -9,7 +9,7 @@ namespace CodingPortfolio.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
         public AuthController(IAuthService authService)
@@ -21,6 +21,7 @@ namespace CodingPortfolio.Controllers
         {
             var developer = await _authService.RegisterAsync(request.Name, request.Email, request.Password);
             if (developer is null)
+
             return Conflict(new { message = "Email already registered" });
 
             var response = new DeveloperResponse(developer.DeveloperId, developer.Name, developer.Email, developer.CreatedAt);
